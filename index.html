@@ -1,0 +1,1034 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
+<meta name="theme-color" content="#0a0a14"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="Tracker"/>
+<title>Daily Tracker — Jauhar</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Syne:wght@400;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+
+<style>
+:root{
+  --bg:#0a0a14;--bg2:#0f0f1e;--bg3:#14142a;
+  --sur:rgba(255,255,255,0.04);--sur2:rgba(255,255,255,0.07);
+  --bdr:rgba(255,255,255,0.08);--bdr2:rgba(255,255,255,0.14);
+  --gold:#f4a847;--gold-d:rgba(244,168,71,0.14);--gold-g:rgba(244,168,71,0.28);
+  --teal:#2dd4bf;--teal-d:rgba(45,212,191,0.12);
+  --vio:#a78bfa;--vio-d:rgba(167,139,250,0.12);
+  --rose:#fb7185;--rose-d:rgba(251,113,133,0.12);
+  --amb:#fbbf24;--amb-d:rgba(251,191,36,0.12);
+  --t1:#f0ece4;--t2:rgba(240,236,228,0.58);--t3:rgba(240,236,228,0.32);
+  --fd:'Cormorant Garamond',Georgia,serif;
+  --fb:'Syne',system-ui,sans-serif;
+  --fm:'DM Mono',monospace;
+  --r:14px;--rl:20px;--rx:28px;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow-x:hidden}
+body{font-family:var(--fb);background:var(--bg);color:var(--t1);min-height:100vh;padding-bottom:88px}
+::-webkit-scrollbar{width:3px}::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.08);border-radius:2px}
+
+/* BG */
+.bg-c{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.bg-glow{position:absolute;border-radius:50%;filter:blur(90px)}
+.bg-g1{width:420px;height:420px;background:rgba(244,168,71,0.06);top:-120px;left:-100px}
+.bg-g2{width:360px;height:360px;background:rgba(167,139,250,0.05);bottom:-80px;right:-80px}
+.bg-g3{width:280px;height:280px;background:rgba(45,212,191,0.04);top:45%;left:50%;transform:translate(-50%,-50%)}
+
+/* ANIMS */
+@keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+@keyframes popIn{0%{transform:scale(0.8);opacity:0}70%{transform:scale(1.06)}100%{transform:scale(1);opacity:1}}
+@keyframes pulseRing{0%{box-shadow:0 0 0 0 var(--gold-g)}70%{box-shadow:0 0 0 12px transparent}100%{box-shadow:0 0 0 0 transparent}}
+@keyframes xpFly{0%{opacity:1;transform:translateY(0) scale(1)}100%{opacity:0;transform:translateY(-64px) scale(1.5)}}
+@keyframes confettiDrop{0%{transform:translateY(-10px) rotate(0deg);opacity:1}100%{transform:translateY(80px) rotate(720deg);opacity:0}}
+@keyframes shimmerBar{0%{background-position:-200% center}100%{background-position:200% center}}
+
+/* WRAPPER */
+.wrap{position:relative;z-index:1;max-width:480px;margin:0 auto}
+
+/* HEADER */
+.hdr{position:sticky;top:0;z-index:200;background:rgba(10,10,20,0.9);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border-bottom:1px solid var(--bdr);padding:14px 18px 10px}
+.hdr-eyebrow{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--gold);font-family:var(--fm);font-weight:500}
+.hdr-row{display:flex;align-items:center;justify-content:space-between;margin-top:3px}
+.hdr-title{font-family:var(--fd);font-size:27px;font-weight:700;color:var(--t1);letter-spacing:-0.5px;line-height:1}
+.xp-pill{display:flex;align-items:center;gap:5px;background:var(--gold-d);border:1px solid var(--gold-g);border-radius:30px;padding:5px 12px;cursor:pointer;transition:all 0.2s}
+.xp-pill:active{transform:scale(0.95)}
+.xp-pill-lv{font-size:9px;color:var(--gold);font-family:var(--fm);text-transform:uppercase;letter-spacing:1px}
+.xp-pill-num{font-family:var(--fm);font-size:12px;font-weight:500;color:var(--gold)}
+.hdr-sub{font-size:11px;color:var(--t3);margin-top:5px;display:flex;align-items:center;gap:8px;font-family:var(--fm)}
+.hdr-score{color:var(--gold);font-weight:600}
+
+/* XP BAR */
+.xp-bar-wrap{background:rgba(10,10,20,0.9);backdrop-filter:blur(24px);border-bottom:1px solid var(--bdr);padding:0 18px 9px;position:sticky;top:76px;z-index:199}
+.xp-bar-info{display:flex;justify-content:space-between;font-size:10px;margin-bottom:5px;font-family:var(--fm);color:var(--t3)}
+.xp-bar-lv{color:var(--gold)}
+.xp-track{height:4px;background:rgba(255,255,255,0.08);border-radius:2px;overflow:hidden}
+.xp-fill{height:100%;border-radius:2px;background:linear-gradient(90deg,#d97706,#f4a847,#fbbf24);background-size:200% auto;transition:width 0.8s cubic-bezier(.34,1.56,.64,1)}
+
+/* TABS */
+.tabs{display:flex;padding:0 18px;background:rgba(10,10,20,0.9);backdrop-filter:blur(24px);border-bottom:1px solid var(--bdr);position:sticky;top:115px;z-index:198}
+.tab{flex:1;padding:9px 0;border:none;background:none;cursor:pointer;font-family:var(--fb);font-size:11px;font-weight:700;color:var(--t3);border-bottom:2px solid transparent;transition:all 0.2s;letter-spacing:0.3px;white-space:nowrap}
+.tab.on{color:var(--gold);border-bottom-color:var(--gold);background:var(--gold-d)}
+.tab span{display:block;font-size:16px;margin-bottom:1px}
+
+/* CONTENT */
+.pane{padding:15px 15px;animation:fadeUp 0.3s ease}
+
+/* IDENTITY */
+.id-card{background:linear-gradient(135deg,rgba(244,168,71,0.07),rgba(167,139,250,0.07));border:1px solid rgba(244,168,71,0.18);border-radius:var(--rx);padding:17px 18px;margin-bottom:13px;position:relative;overflow:hidden}
+.id-card::before{content:'';position:absolute;top:-50px;right:-50px;width:130px;height:130px;background:radial-gradient(circle,rgba(244,168,71,0.1),transparent);border-radius:50%}
+.id-eyebrow{font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--gold);font-family:var(--fm)}
+.id-text{font-family:var(--fd);font-size:18px;color:var(--t1);margin-top:5px;line-height:1.35;font-weight:700}
+.id-sub{font-size:10.5px;color:var(--t2);margin-top:3px}
+.vote-row{display:flex;align-items:center;gap:9px;margin-top:11px}
+.vote-track{flex:1;height:5px;background:rgba(255,255,255,0.08);border-radius:3px;overflow:hidden}
+.vote-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--gold),var(--amb));transition:width 0.8s cubic-bezier(.34,1.56,.64,1)}
+.vote-ct{font-size:11px;color:var(--gold);font-family:var(--fm);font-weight:500;white-space:nowrap}
+
+/* SCORE */
+.score-card{background:var(--sur);border:1px solid var(--bdr);border-radius:var(--rx);padding:15px;margin-bottom:13px;display:flex;align-items:center;gap:15px}
+.ring-wrap{position:relative;flex-shrink:0}
+.ring-wrap svg{transform:rotate(-90deg);display:block}
+.ring-txt{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.ring-num{font-family:var(--fd);font-size:25px;font-weight:700;color:var(--t1);line-height:1}
+.ring-den{font-size:9px;color:var(--t3);font-family:var(--fm)}
+.score-tasks{display:flex;flex-direction:column;gap:5px}
+.stask{display:flex;align-items:center;gap:7px;font-size:11.5px;font-weight:600}
+.stask.ok{color:var(--teal)}
+.stask.no{color:var(--t2)}
+
+/* HABIT CARD */
+.hc{background:var(--sur);border:1px solid var(--bdr);border-radius:var(--rl);padding:15px 17px;margin-bottom:11px;position:relative;overflow:hidden;transition:border-color 0.3s,transform 0.15s}
+.hc:active{transform:scale(0.99)}
+.hc.done{border-color:rgba(45,212,191,0.22)}
+.hc-accent{position:absolute;left:0;top:0;bottom:0;width:3px;border-radius:3px 0 0 3px}
+.hc-hdr{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;flex-wrap:wrap}
+.hc-title{font-size:14px;font-weight:700;color:var(--t1);display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+.hc-sub{font-size:11px;color:var(--t3);margin-top:2px;line-height:1.4}
+
+/* BADGE */
+.badge{display:inline-flex;align-items:center;gap:3px;border-radius:20px;padding:3px 9px;font-size:10px;font-weight:700;letter-spacing:0.3px;white-space:nowrap;font-family:var(--fm)}
+.badge.g{background:var(--gold-d);border:1px solid rgba(244,168,71,0.22);color:var(--gold)}
+.badge.t{background:var(--teal-d);border:1px solid rgba(45,212,191,0.22);color:var(--teal)}
+.badge.v{background:var(--vio-d);border:1px solid rgba(167,139,250,0.22);color:var(--vio)}
+.badge.r{background:var(--rose-d);border:1px solid rgba(251,113,133,0.22);color:var(--rose)}
+.badge.a{background:var(--amb-d);border:1px solid rgba(251,191,36,0.22);color:var(--amb)}
+
+/* PRAYER GRID */
+.pgrid{display:grid;grid-template-columns:repeat(5,1fr);gap:7px;margin-top:13px}
+.pbtn{background:rgba(255,255,255,0.04);border:1px solid var(--bdr);border-radius:12px;padding:10px 4px;cursor:pointer;text-align:center;transition:all 0.25s cubic-bezier(.34,1.56,.64,1)}
+.pbtn.on{background:rgba(45,212,191,0.14);border-color:rgba(45,212,191,0.38);transform:scale(1.06);animation:pulseRing 0.5s ease}
+.pbtn-ic{font-size:18px;display:block}
+.pbtn-nm{font-size:9px;font-weight:600;color:var(--t3);margin-top:2px;display:block;font-family:var(--fm)}
+.pbtn.on .pbtn-nm{color:var(--teal)}
+.pbtn-ck{font-size:9px;color:var(--t3);margin-top:1px;display:block}
+.pbtn.on .pbtn-ck{color:var(--teal)}
+
+/* PROGRESS */
+.prog-row{display:flex;justify-content:space-between;font-size:10px;margin-top:9px;margin-bottom:4px;font-family:var(--fm)}
+.prog-track{height:4px;border-radius:2px;background:rgba(255,255,255,0.07);overflow:hidden}
+.prog-fill{height:100%;border-radius:2px;transition:width 0.7s cubic-bezier(.34,1.56,.64,1)}
+
+/* CHECKBOX */
+.crow{display:flex;align-items:center;gap:13px;margin-top:13px}
+.cbox{width:27px;height:27px;border-radius:8px;border:2px solid rgba(255,255,255,0.16);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;transition:all 0.25s cubic-bezier(.34,1.56,.64,1)}
+.cbox.on{border:none;transform:scale(1.1)}
+.cbox.on.ct{background:linear-gradient(135deg,var(--teal),#0d9488);box-shadow:0 0 16px rgba(45,212,191,0.32)}
+.cbox.on.cv{background:linear-gradient(135deg,var(--vio),#7c3aed);box-shadow:0 0 16px rgba(167,139,250,0.32)}
+.cbox.on.cr{background:linear-gradient(135deg,var(--rose),#e11d48);box-shadow:0 0 16px rgba(251,113,133,0.32)}
+.cbox.on.ca{background:linear-gradient(135deg,var(--amb),#d97706);box-shadow:0 0 16px rgba(251,191,36,0.32)}
+.clbl{font-size:12.5px;font-weight:600}
+.clbl.ok{color:var(--teal)}.clbl.no{color:var(--t2)}
+
+/* EAT */
+.egrid{display:flex;gap:6px;margin-top:11px}
+.ebtn{flex:1;padding:10px 0;border-radius:10px;border:1px solid var(--bdr);background:rgba(255,255,255,0.04);cursor:pointer;font-size:19px;transition:all 0.2s;display:flex;align-items:center;justify-content:center}
+.ebtn.on{background:rgba(251,191,36,0.18);border-color:rgba(251,191,36,0.38);transform:scale(1.14)}
+.enote{font-size:10.5px;color:var(--t3);text-align:center;margin-top:7px;font-family:var(--fm)}
+
+/* FAST */
+.fast-today{border-color:rgba(244,168,71,0.28);background:rgba(244,168,71,0.04)}
+.arabic{font-size:12px;color:rgba(244,168,71,0.48);letter-spacing:2px;margin-top:4px}
+.nfd{font-size:11px;color:var(--gold);margin-top:5px;font-family:var(--fm);display:flex;align-items:center;gap:5px}
+
+/* PROGRESS TAB */
+.chart-wrap{background:var(--sur);border:1px solid var(--bdr);border-radius:var(--rx);padding:17px;margin-bottom:13px}
+.section-lbl{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--gold);font-family:var(--fm);margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.section-lbl::after{content:'';flex:1;height:1px;background:var(--bdr)}
+.bar-chart{display:flex;gap:5px;align-items:flex-end;height:108px}
+.bar-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px}
+.bar-sc{font-size:9px;font-weight:700;font-family:var(--fm)}
+.bar-track{width:100%;border-radius:5px;height:72px;background:rgba(255,255,255,0.05);display:flex;align-items:flex-end}
+.bar-fill{width:100%;border-radius:5px;transition:height 0.7s cubic-bezier(.34,1.56,.64,1)}
+.bar-day{font-size:9px;color:var(--t3);font-weight:600;font-family:var(--fm)}
+.bar-today .bar-day{color:var(--gold);font-weight:800}
+
+.sg{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:13px}
+.sstat{background:var(--sur2);border:1px solid var(--bdr);border-radius:var(--rl);padding:13px 14px;text-align:center}
+.sstat-ic{font-size:20px;margin-bottom:4px}
+.sstat-nm{font-size:9px;color:var(--t3);font-family:var(--fm);text-transform:uppercase;letter-spacing:0.5px}
+.sstat-n{font-family:var(--fd);font-size:27px;font-weight:700;line-height:1.1;margin:2px 0}
+.sstat-u{font-size:9px;color:var(--t3);font-family:var(--fm)}
+
+.one-pct{background:linear-gradient(135deg,rgba(244,168,71,0.06),rgba(167,139,250,0.06));border:1px solid rgba(244,168,71,0.14);border-radius:var(--rx);padding:17px;margin-bottom:13px}
+.one-pct-top{display:flex;justify-content:space-between;align-items:flex-start}
+.one-pct-num{font-family:var(--fd);font-size:36px;font-weight:700;color:var(--gold);line-height:1}
+.one-pct-desc{font-size:11px;color:var(--t2);margin-top:7px;line-height:1.6}
+
+.laws{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:13px}
+.law{background:var(--sur2);border:1px solid var(--bdr);border-radius:var(--r);padding:11px 13px}
+.law-n{font-size:9px;font-family:var(--fm);color:var(--t3);text-transform:uppercase;letter-spacing:1px}
+.law-name{font-size:12px;font-weight:700;color:var(--t1);margin:2px 0}
+.law-desc{font-size:10px;color:var(--t3);line-height:1.4}
+.law-sc{font-family:var(--fm);font-size:18px;margin-top:5px}
+
+/* REWARD TAB */
+.ms-scroll{display:flex;gap:9px;overflow-x:auto;padding-bottom:3px;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch}
+.ms-scroll::-webkit-scrollbar{height:0}
+.ms-card{flex:0 0 138px;scroll-snap-align:start;background:var(--sur2);border:1px solid var(--bdr);border-radius:var(--rl);padding:12px 13px;transition:all 0.2s}
+.ms-card.unlocked{border-color:rgba(244,168,71,0.28)}
+.ms-card.locked{opacity:0.5;filter:grayscale(0.4)}
+.ms-ic{font-size:22px;margin-bottom:6px}
+.ms-nm{font-size:11px;font-weight:700;color:var(--t1);margin-bottom:2px}
+.ms-cd{font-size:9px;color:var(--t3);font-family:var(--fm);line-height:1.4}
+.ms-badge{display:inline-block;margin-top:6px;font-size:9px;padding:2px 7px;border-radius:20px;font-family:var(--fm);font-weight:700}
+.ms-badge.y{background:var(--gold-d);color:var(--gold);border:1px solid rgba(244,168,71,0.28)}
+.ms-badge.n{background:rgba(255,255,255,0.05);color:var(--t3);border:1px solid var(--bdr)}
+
+.wk-item{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--bdr)}
+.wk-item:last-child{border-bottom:none}
+.wk-name{font-size:12px;font-weight:700;color:var(--t1)}
+.wk-desc{font-size:10px;color:var(--t3);font-family:var(--fm);margin-top:2px}
+.wk-prog{font-size:11px;font-family:var(--fm);white-space:nowrap;margin-left:10px}
+
+/* NOTIF TAB */
+.nstatus{padding:11px 15px;border-radius:var(--r);font-size:11.5px;margin-bottom:13px;line-height:1.6;font-weight:500}
+.nstatus.ok{background:rgba(45,212,191,0.07);color:var(--teal);border:1px solid rgba(45,212,191,0.18)}
+.nstatus.warn{background:rgba(244,168,71,0.07);color:var(--gold);border:1px solid rgba(244,168,71,0.18)}
+.nstatus.err{background:rgba(251,113,133,0.07);color:var(--rose);border:1px solid rgba(251,113,133,0.18)}
+
+.npanel{background:var(--sur);border:1px solid var(--bdr);border-radius:var(--rx);padding:15px 17px;margin-bottom:13px}
+.npanel-title{font-size:13px;font-weight:700;color:var(--t1);margin-bottom:13px;display:flex;align-items:center;gap:7px}
+.nitem{display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid rgba(255,255,255,0.05)}
+.nitem:last-child{border-bottom:none}
+.nname{font-size:12px;font-weight:600;color:var(--t1)}
+.ntime{font-size:10px;color:var(--t3);margin-top:1px;font-family:var(--fm)}
+.tog{position:relative;width:40px;height:22px;flex-shrink:0}
+.tog input{opacity:0;width:0;height:0;position:absolute}
+.tog-sl{position:absolute;inset:0;border-radius:11px;background:rgba(255,255,255,0.1);cursor:pointer;transition:0.3s}
+.tog-sl::before{content:'';position:absolute;width:16px;height:16px;border-radius:50%;background:#fff;top:3px;left:3px;transition:0.3s;box-shadow:0 1px 4px rgba(0,0,0,0.4)}
+.tog input:checked+.tog-sl{background:var(--teal)}
+.tog input:checked+.tog-sl::before{transform:translateX(18px)}
+
+.btn{display:inline-flex;align-items:center;gap:7px;padding:11px 20px;border-radius:12px;border:none;font-family:var(--fb);font-size:12px;font-weight:700;cursor:pointer;transition:all 0.2s;letter-spacing:0.3px}
+.btn-g{background:linear-gradient(135deg,#d97706,#f4a847);color:#0a0a14}
+.btn-o{background:transparent;border:1px solid var(--bdr2);color:var(--t2)}
+.btn:active{transform:scale(0.95)}
+
+.icard{background:var(--sur);border:1px solid var(--bdr);border-radius:var(--rl);padding:14px 16px;margin-bottom:10px}
+.icard-title{font-size:13px;font-weight:700;color:var(--t1);margin-bottom:7px;display:flex;align-items:center;gap:6px}
+.icard-body{font-size:11.5px;color:var(--t2);line-height:1.85}
+.icard-body li{margin-left:16px;margin-bottom:2px}
+.lnk{color:var(--vio);text-decoration:none;border-bottom:1px solid rgba(167,139,250,0.28)}
+
+/* INSTALL BANNER */
+.install-banner{background:linear-gradient(135deg,var(--gold-d),rgba(167,139,250,0.1));border:1px solid var(--gold-g);border-radius:var(--rl);padding:13px 15px;margin-bottom:13px;display:none;align-items:center;gap:11px}
+.install-banner.show{display:flex}
+.install-text{flex:1;font-size:12px;color:var(--t1);font-weight:700}
+.install-sub{font-size:10px;color:var(--t2);font-weight:400;margin-top:1px}
+.install-btn{padding:8px 13px;border-radius:10px;border:none;background:var(--gold);color:#0a0a14;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;font-family:var(--fb)}
+
+/* TOAST */
+.toast{position:fixed;bottom:98px;left:50%;transform:translateX(-50%) translateY(14px);background:rgba(20,20,40,0.96);border:1px solid rgba(255,255,255,0.1);backdrop-filter:blur(20px);padding:10px 20px;border-radius:14px;font-size:12px;font-weight:600;color:var(--t1);z-index:9999;opacity:0;transition:all 0.3s;white-space:nowrap;box-shadow:0 12px 40px rgba(0,0,0,0.5)}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* XP FLY */
+.xfly{position:fixed;z-index:9998;pointer-events:none;font-family:var(--fm);font-size:13px;font-weight:600;color:var(--gold);animation:xpFly 1s ease forwards}
+
+/* CONFETTI */
+.cfp{position:fixed;pointer-events:none;z-index:9997;width:8px;height:8px;border-radius:2px;animation:confettiDrop 1.5s ease forwards}
+
+/* BOTTOM NAV */
+.bnav{position:fixed;bottom:0;left:0;right:0;z-index:300;background:rgba(10,10,20,0.95);backdrop-filter:blur(24px);border-top:1px solid var(--bdr);display:flex;align-items:center;justify-content:space-around;padding:7px 0 max(7px,env(safe-area-inset-bottom));max-width:480px;margin:0 auto}
+.bnav-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:5px 0;cursor:pointer;border:none;background:none;transition:all 0.2s}
+.bnav-btn span{font-size:20px;line-height:1}
+.bnav-btn-l{font-size:9px;font-weight:700;color:var(--t3);letter-spacing:0.5px;font-family:var(--fm)}
+.bnav-btn.on .bnav-btn-l{color:var(--gold)}
+.bnav-btn:active{transform:scale(0.88)}
+.spacer{height:20px}
+</style>
+</head>
+<body>
+
+<div class="bg-c" aria-hidden="true">
+  <div class="bg-glow bg-g1"></div>
+  <div class="bg-glow bg-g2"></div>
+  <div class="bg-glow bg-g3"></div>
+</div>
+
+<div class="wrap">
+
+<!-- HEADER -->
+<div class="hdr">
+  <div class="hdr-eyebrow" id="dayGreet">Bismillah · Senin</div>
+  <div class="hdr-row">
+    <div class="hdr-title">Daily Tracker</div>
+    <div class="xp-pill" onclick="switchTab('reward')">
+      <span class="xp-pill-lv">LVL <span id="lvNum">1</span></span>
+      <span style="color:var(--gold);font-size:13px">✦</span>
+      <span class="xp-pill-num" id="xpNum">0 XP</span>
+    </div>
+  </div>
+  <div class="hdr-sub">
+    <span id="dateStr">—</span>
+    <span class="hdr-score" id="hdrScore">0/4 selesai</span>
+  </div>
+</div>
+
+<!-- XP BAR -->
+<div class="xp-bar-wrap">
+  <div class="xp-bar-info">
+    <span class="xp-bar-lv" id="lvLabel">Level 1 — Pemula</span>
+    <span id="xpNext">0/100 XP</span>
+  </div>
+  <div class="xp-track"><div class="xp-fill" id="xpFill" style="width:0%"></div></div>
+</div>
+
+<!-- TABS -->
+<div class="tabs">
+  <button class="tab on" onclick="switchTab('today')"><span>📋</span>Hari Ini</button>
+  <button class="tab" onclick="switchTab('progress')"><span>📊</span>Progres</button>
+  <button class="tab" onclick="switchTab('reward')"><span>🏆</span>Reward</button>
+  <button class="tab" onclick="switchTab('notif')"><span>🔔</span>Notif</button>
+</div>
+
+<div class="toast" id="toast" role="alert" aria-live="polite"></div>
+
+<!-- ══ TAB TODAY ══ -->
+<div class="pane" id="tab-today">
+
+  <div class="install-banner" id="installBanner">
+    <div><div class="install-text">📲 Pasang ke Home Screen</div><div class="install-sub">Notifikasi aktif bahkan saat app ditutup</div></div>
+    <button class="install-btn" onclick="doInstall()">Install</button>
+  </div>
+
+  <!-- Identity -->
+  <div class="id-card">
+    <div class="id-eyebrow">Identitasmu (Atomic Habits)</div>
+    <div class="id-text">Saya adalah orang yang disiplin, sehat, dan terus belajar.</div>
+    <div class="id-sub">Setiap tindakanmu = 1 suara untuk identitas ini ✦</div>
+    <div class="vote-row">
+      <div class="vote-track"><div class="vote-fill" id="voteBar" style="width:0%"></div></div>
+      <div class="vote-ct" id="voteCt">0 votes</div>
+    </div>
+  </div>
+
+  <!-- Score ring -->
+  <div class="score-card">
+    <div class="ring-wrap">
+      <svg width="86" height="86">
+        <circle cx="43" cy="43" r="35" fill="none" stroke="rgba(255,255,255,0.07)" stroke-width="7"/>
+        <circle id="ringC" cx="43" cy="43" r="35" fill="none" stroke="var(--gold)" stroke-width="7"
+          stroke-dasharray="219.9" stroke-dashoffset="219.9" stroke-linecap="round"
+          style="transition:stroke-dashoffset 0.8s cubic-bezier(.34,1.56,.64,1)"/>
+      </svg>
+      <div class="ring-txt">
+        <div class="ring-num" id="ringNum">0</div>
+        <div class="ring-den" id="ringDen">/4</div>
+      </div>
+    </div>
+    <div id="scoreTasks" class="score-tasks"></div>
+  </div>
+
+  <!-- PLANK -->
+  <div class="hc" id="plankCard">
+    <div class="hc-accent" style="background:var(--teal)"></div>
+    <div class="hc-hdr">
+      <div><div class="hc-title">🧘 Plank 30 Detik</div><div class="hc-sub">Habit Stacking — setelah setiap shalat wajib</div></div>
+      <div id="plankBadge"></div>
+    </div>
+    <div class="pgrid" id="pgrid"></div>
+    <div class="prog-row">
+      <span style="color:var(--t3)" id="pCt">0/5 shalat</span>
+      <span style="color:var(--teal);font-weight:700" id="pTotal">0s total</span>
+    </div>
+    <div class="prog-track"><div class="prog-fill" id="pBar" style="background:var(--teal);width:0%"></div></div>
+  </div>
+
+  <!-- BOOK -->
+  <div class="hc" id="bookCard">
+    <div class="hc-accent" style="background:var(--vio)"></div>
+    <div class="hc-hdr">
+      <div><div class="hc-title">📖 Baca Buku 15 Menit</div><div class="hc-sub">Guerrilla Marketing · <a href="https://lynk.id/guerrilla" target="_blank" class="lnk">lynk.id/guerrilla</a></div></div>
+      <div id="bookBadge"></div>
+    </div>
+    <div class="crow">
+      <div class="cbox cv" id="bookBox" onclick="toggleKey('book')" role="checkbox"></div>
+      <div style="flex:1"><div class="clbl no" id="bookLbl">Tandai selesai membaca hari ini</div>
+      <div class="prog-track" style="margin-top:6px"><div class="prog-fill" id="bookBar" style="background:var(--vio);width:0%"></div></div></div>
+    </div>
+  </div>
+
+  <!-- MAILERLITE -->
+  <div class="hc" id="mlCard">
+    <div class="hc-accent" style="background:var(--rose)"></div>
+    <div class="hc-hdr">
+      <div><div class="hc-title">📧 Belajar MailerLite</div><div class="hc-sub">Maks 10 menit · Email Marketing Skill</div></div>
+      <div id="mlBadge"></div>
+    </div>
+    <div class="crow">
+      <div class="cbox cr" id="mlBox" onclick="toggleKey('mailerlite')" role="checkbox"></div>
+      <div style="flex:1"><div class="clbl no" id="mlLbl">Tandai sesi belajar selesai</div>
+      <div class="prog-track" style="margin-top:6px"><div class="prog-fill" id="mlBar" style="background:var(--rose);width:0%"></div></div></div>
+    </div>
+  </div>
+
+  <!-- EAT -->
+  <div class="hc" id="eatCard">
+    <div class="hc-accent" style="background:var(--amb)"></div>
+    <div class="hc-hdr">
+      <div><div class="hc-title">🥦 Pola Makan Sehat</div><div class="hc-sub">Nilai kualitas makan hari ini</div></div>
+      <div id="eatBadge"></div>
+    </div>
+    <div class="egrid" id="egrid"></div>
+    <div class="enote" id="enote">Belum dinilai hari ini</div>
+  </div>
+
+  <!-- FAST -->
+  <div class="hc" id="fastCard">
+    <div class="hc-accent" style="background:var(--gold)"></div>
+    <div class="hc-hdr">
+      <div><div class="hc-title">🌙 Puasa Daud <span id="fastTdBadge" class="badge g" style="display:none">HARI INI</span></div>
+      <div class="hc-sub">Setiap 2 hari sekali · Senin–Jumat</div></div>
+      <div id="fastBadge"></div>
+    </div>
+    <div class="arabic">صيام داوود عليه السلام</div>
+    <div id="fastContent" style="margin-top:12px"></div>
+  </div>
+
+  <div class="spacer"></div>
+</div>
+
+<!-- ══ TAB PROGRESS ══ -->
+<div class="pane" id="tab-progress" style="display:none">
+  <div class="one-pct">
+    <div class="one-pct-top">
+      <div><div class="section-lbl" style="margin-bottom:4px">1% Lebih Baik Tiap Hari</div><div class="one-pct-num" id="onePctN">+0%</div></div>
+      <span style="font-size:34px">📈</span>
+    </div>
+    <div class="one-pct-desc" id="onePctDesc">Konsistensi kecil setiap hari menghasilkan hasil luar biasa.</div>
+  </div>
+
+  <div class="chart-wrap">
+    <div class="section-lbl">7 Hari Terakhir</div>
+    <div class="bar-chart" id="barChart"></div>
+  </div>
+
+  <div class="sg" id="streakGrid"></div>
+
+  <div class="section-lbl">4 Hukum Atomic Habits</div>
+  <div class="laws" id="lawsGrid"></div>
+
+  <div class="spacer"></div>
+</div>
+
+<!-- ══ TAB REWARD ══ -->
+<div class="pane" id="tab-reward" style="display:none">
+
+  <div class="id-card" style="margin-bottom:13px">
+    <div class="id-eyebrow">Level Identitas</div>
+    <div id="rwLvTxt" style="font-family:var(--fd);font-size:21px;color:var(--t1);font-weight:700;margin-top:4px"></div>
+    <div id="rwLvDesc" style="font-size:11px;color:var(--t2);margin-top:3px"></div>
+    <div style="margin-top:11px">
+      <div class="xp-track"><div class="xp-fill" id="rwXpBar" style="width:0%"></div></div>
+      <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--t3);font-family:var(--fm);margin-top:4px">
+        <span id="rwXpCur"></span><span id="rwXpMax"></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-lbl">🏅 Milestone</div>
+  <div class="ms-scroll" id="msScroll" style="margin-bottom:14px"></div>
+
+  <div class="chart-wrap">
+    <div class="section-lbl">🎯 Tantangan Minggu Ini</div>
+    <div id="weeklyChallenge"></div>
+  </div>
+
+  <div class="icard" style="border-color:rgba(244,168,71,0.14);background:rgba(244,168,71,0.04);margin-top:13px">
+    <div class="icard-title">📜 Kontrak Kebiasaan</div>
+    <div class="icard-body" style="line-height:2.1">
+      Saya, <strong style="color:var(--gold)">Jauhar</strong>, berkomitmen untuk:<br>
+      ✦ Plank 30 detik setelah setiap shalat wajib<br>
+      ✦ Membaca buku Guerrilla Marketing 15 menit/hari<br>
+      ✦ Belajar MailerLite 10 menit/hari<br>
+      ✦ Menjaga pola makan sehat setiap hari<br>
+      ✦ Menjalankan Puasa Daud sesuai jadwal
+    </div>
+  </div>
+
+  <div class="spacer"></div>
+</div>
+
+<!-- ══ TAB NOTIF ══ -->
+<div class="pane" id="tab-notif" style="display:none">
+  <div class="nstatus" id="nstatus"></div>
+
+  <div class="npanel">
+    <div class="npanel-title">🔔 Jadwal Pengingat Harian</div>
+    <div id="nlist"></div>
+  </div>
+
+  <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:13px">
+    <button class="btn btn-g" onclick="reqNotif()">✅ Aktifkan Notifikasi</button>
+    <button class="btn btn-o" onclick="testNotif()">🧪 Test Notif</button>
+  </div>
+
+  <div class="icard">
+    <div class="icard-title">📱 Cara Aktifkan di Android</div>
+    <div class="icard-body">
+      <ol style="padding-left:16px;line-height:2.3">
+        <li>Buka file <code>daily-tracker.html</code> ini via <strong>Chrome Android</strong></li>
+        <li>Tap ⋮ → <strong>"Tambahkan ke Layar Utama"</strong></li>
+        <li>Buka app dari Home Screen (ikon muncul)</li>
+        <li>Tap <strong>"Aktifkan Notifikasi"</strong> → Izinkan</li>
+        <li>Notifikasi aktif bahkan saat app ditutup ✦</li>
+      </ol>
+    </div>
+  </div>
+
+  <div class="icard">
+    <div class="icard-title">💾 Tentang Data</div>
+    <div class="icard-body">Semua data tersimpan otomatis di HP kamu (localStorage). Tidak ada server — 100% offline &amp; privat. Selama buka file dari Chrome yang sama, data tidak hilang.</div>
+  </div>
+
+  <div class="spacer"></div>
+</div>
+
+</div><!-- /wrap -->
+
+<!-- BOTTOM NAV -->
+<nav class="bnav" role="navigation" aria-label="Tab utama">
+  <button class="bnav-btn on" onclick="switchTab('today')" id="bnav-today"><span>📋</span><div class="bnav-btn-l">Hari Ini</div></button>
+  <button class="bnav-btn" onclick="switchTab('progress')" id="bnav-progress"><span>📊</span><div class="bnav-btn-l">Progres</div></button>
+  <button class="bnav-btn" onclick="switchTab('reward')" id="bnav-reward"><span>🏆</span><div class="bnav-btn-l">Reward</div></button>
+  <button class="bnav-btn" onclick="switchTab('notif')" id="bnav-notif"><span>🔔</span><div class="bnav-btn-l">Notif</div></button>
+</nav>
+
+<!-- ══════════════════════════════════════════════════════
+     JAVASCRIPT — ALL LOGIC
+══════════════════════════════════════════════════════ -->
+<script>
+
+/* ── NO SERVICE WORKER — Pure inline notification scheduler ── */
+// SW via Blob/external file tidak didukung di environment ini.
+// Notifikasi dijadwalkan langsung dengan setTimeout di main thread.
+
+/* ── DATA ── */
+const PRAYERS=[
+  {id:'subuh',  nm:'Subuh',  ic:'🌙'},
+  {id:'dzuhur', nm:'Dzuhur', ic:'☀️'},
+  {id:'ashar',  nm:'Ashar',  ic:'🌤'},
+  {id:'maghrib',nm:'Maghrib',ic:'🌅'},
+  {id:'isya',   nm:'Isya',   ic:'🌃'},
+];
+const DAYS=['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
+const DAYSS=['Min','Sen','Sel','Rab','Kam','Jum','Sab'];
+const MONTHS=['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
+const EAT=['😔','😐','🙂','😊','🥗'];
+
+const NOTIFS=[
+  {id:'subuh',    nm:'Subuh + Plank',   hour:4, min:30, title:'🌙 Waktunya Subuh!',      msg:'Jangan lupa plank 30 detik setelahnya 💪'},
+  {id:'dzuhur',   nm:'Dzuhur + Plank',  hour:12,min:0,  title:'☀️ Waktunya Dzuhur!',     msg:'Plank 30 detik menanti setelah shalat 🧘'},
+  {id:'ashar',    nm:'Ashar + Plank',   hour:15,min:30, title:'🌤 Waktunya Ashar!',      msg:'Semangat terus hari ini! 💪'},
+  {id:'maghrib',  nm:'Maghrib + Plank', hour:18,min:0,  title:'🌅 Waktunya Maghrib!',    msg:'Plank ringan setelah shalat 🙌'},
+  {id:'isya',     nm:'Isya + Plank',    hour:19,min:30, title:'🌃 Waktunya Isya!',       msg:'Plank terakhir hari ini. Selesaikan kuat! ⚡'},
+  {id:'book',     nm:'Baca Buku',       hour:20,min:0,  title:'📖 Waktunya Membaca!',    msg:'15 menit Guerrilla Marketing — investasi terbaik 📚'},
+  {id:'mailerlite',nm:'MailerLite',     hour:13,min:0,  title:'📧 Waktunya MailerLite!', msg:'10 menit — skill email marketingmu makin tajam!'},
+  {id:'eat',      nm:'Pola Makan',      hour:21,min:0,  title:'🥦 Catat Pola Makan!',    msg:'Rating makan hari ini — satu langkah hidup sehat'},
+  {id:'review',   nm:'Review Harian',   hour:21,min:30, title:'✦ Review Harian',         msg:'2 menit: apa yang sudah kamu capai hari ini? 🌟'},
+];
+
+const LEVELS=[
+  {min:0,   max:99,  nm:'Pemula',   title:'Pemula yang Berani',    desc:'Setiap perjalanan dimulai dari langkah pertama.'},
+  {min:100, max:249, nm:'Pejuang',  title:'Pejuang Konsisten',     desc:'Kamu mulai membuktikan siapa dirimu yang sebenarnya.'},
+  {min:250, max:499, nm:'Disiplin', title:'Yang Disiplin',         desc:'Identitasmu mulai terbentuk. Terus pertahankan!'},
+  {min:500, max:999, nm:'Ahli',     title:'Ahli Kebiasaan',        desc:'Kebiasaan baik sudah menjadi bagian dari dirimu.'},
+  {min:1000,max:1999,nm:'Master',   title:'Master Atomic Habits',  desc:'Kamu adalah bukti bahwa perubahan kecil itu nyata.'},
+  {min:2000,max:9999,nm:'Legenda',  title:'Legenda Disiplin',      desc:'Konsistensimu menginspirasi orang lain. Luar biasa!'},
+];
+
+const MILESTONES=[
+  {id:'first',    ic:'🌱',nm:'Hari Pertama',    cd:'Selesaikan 1 habit',         xp:50,  ck:(h,gs)=>Object.values(h).some(d=>d.book||d.mailerlite||d.eat)},
+  {id:'streak3',  ic:'🔥',nm:'Api Kecil',       cd:'Streak 3 hari beruntun',     xp:100, ck:(h,gs)=>gs('book')>=3||gs('mailerlite')>=3},
+  {id:'perfect',  ic:'⭐',nm:'Hari Sempurna',   cd:'Skor 5/5 dalam satu hari',   xp:150, ck:(h,gs)=>Object.keys(h).some(k=>{const s=scoreDay(h[k]||{},new Date(k));return s.done===s.total&&s.total>=4})},
+  {id:'streak7',  ic:'🌟',nm:'Satu Minggu',     cd:'Streak 7 hari beruntun',     xp:200, ck:(h,gs)=>gs('book')>=7||gs('mailerlite')>=7},
+  {id:'plank5',   ic:'🧘',nm:'Plank Master',    cd:'5/5 shalat+plank dalam 1 hari',xp:100,ck:(h,gs)=>Object.values(h).some(d=>Object.values(d.prayers||{}).filter(Boolean).length===5)},
+  {id:'fast5',    ic:'🌙',nm:'Puasa Istiqomah', cd:'5x puasa Daud berhasil',     xp:200, ck:(h,gs)=>Object.values(h).filter(d=>d.fast).length>=5},
+  {id:'streak30', ic:'🏆',nm:'Satu Bulan!',     cd:'30 hari konsisten',          xp:500, ck:(h,gs)=>gs('book')>=30||gs('mailerlite')>=30},
+  {id:'reader',   ic:'📚',nm:'Pembaca Sejati',  cd:'Baca buku 14 hari berturut', xp:300, ck:(h,gs)=>gs('book')>=14},
+  {id:'marketer', ic:'📧',nm:'Email Marketer',  cd:'MailerLite 14 hari berturut',xp:300, ck:(h,gs)=>gs('mailerlite')>=14},
+  {id:'healthy',  ic:'💪',nm:'Hidup Sehat',     cd:'Makan sehat 10 hari berturut',xp:200,ck:(h,gs)=>gs('eat')>=10},
+];
+
+/* ── STATE ── */
+function ld(k,d={}){try{return JSON.parse(localStorage.getItem(k)||JSON.stringify(d))}catch{return d}}
+function sv(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch{}}
+
+let hist  = ld('dt_v4_hist');
+let nprefs= ld('dt_v4_notif',Object.fromEntries(NOTIFS.map(n=>[n.id,true])));
+let user  = ld('dt_v4_user',{xp:0,ms:[],votes:0});
+let _deferredPrompt=null;
+
+function todayKey(d=new Date()){return `${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`}
+function getDay(d=new Date()){return hist[todayKey(d)]||{}}
+function setDay(data,d=new Date()){hist[todayKey(d)]=data;sv('dt_v4_hist',hist);renderAll()}
+function upUser(u){user={...user,...u};sv('dt_v4_user',user)}
+
+function toggleKey(key){
+  const d=getDay();
+  const wasOn=d[key];
+  setDay({...d,[key]:!wasOn});
+  if(!wasOn)addXP(20);
+}
+function togglePrayer(id){
+  const d=getDay();const p={...(d.prayers||{}),[id]:!((d.prayers||{})[id])};
+  setDay({...d,prayers:p});
+  if(p[id])addXP(15);
+}
+function setEat(r){
+  const d=getDay();const was=d.eat;
+  setDay({...d,eatRating:r,eat:r>=3});
+  if(!was&&r>=3)addXP(20);
+}
+function toggleFast(){const d=getDay();const was=d.fast;setDay({...d,fast:!was});if(!was)addXP(30)}
+
+/* ── XP / LEVELS ── */
+function addXP(amt){
+  upUser({xp:(user.xp||0)+amt,votes:(user.votes||0)+1});
+  flyXP('+'+amt+' XP');
+  checkMS();
+  renderXP();
+}
+
+function getLevel(xp){
+  for(let i=LEVELS.length-1;i>=0;i--){if(xp>=LEVELS[i].min)return{...LEVELS[i],idx:i}}
+  return{...LEVELS[0],idx:0};
+}
+
+function renderXP(){
+  const xp=user.xp||0;
+  const lv=getLevel(xp);
+  const pct=Math.min(100,Math.round(((xp-lv.min)/(lv.max-lv.min))*100));
+  el('lvNum').textContent=lv.idx+1;
+  el('xpNum').textContent=xp+' XP';
+  el('lvLabel').textContent=`Level ${lv.idx+1} — ${lv.nm}`;
+  el('xpNext').textContent=`${xp}/${lv.max} XP`;
+  el('xpFill').style.width=pct+'%';
+  if(el('rwLvTxt')){
+    el('rwLvTxt').textContent=lv.title;
+    el('rwLvDesc').textContent=lv.desc;
+    el('rwXpBar').style.width=pct+'%';
+    el('rwXpCur').textContent=xp+' XP';
+    el('rwXpMax').textContent=lv.max+' XP';
+  }
+}
+
+function flyXP(txt){
+  const e=document.createElement('div');
+  e.className='xfly';e.textContent=txt;
+  e.style.cssText=`top:${82+Math.random()*30}px;left:${45+Math.random()*35}%`;
+  document.body.appendChild(e);setTimeout(()=>e.remove(),1100);
+}
+
+/* ── MILESTONES ── */
+function checkMS(){
+  const done=user.ms||[];
+  const gs=k=>getStreak(k);
+  MILESTONES.forEach(m=>{
+    if(done.includes(m.id))return;
+    if(m.ck(hist,gs)){
+      done.push(m.id);
+      upUser({ms:done,xp:(user.xp||0)+m.xp});
+      showToast(`🏅 ${m.nm} terbuka! +${m.xp} XP`);
+      confetti();
+    }
+  });
+}
+
+/* ── SCORE ── */
+function scoreDay(data,date=new Date()){
+  const isFast=isDaud(date);
+  const pDone=Object.values(data.prayers||{}).filter(Boolean).length;
+  const tasks=[
+    {lbl:'Shalat + Plank',ic:'🧘',done:pDone===5},
+    {lbl:'Baca Buku',     ic:'📖',done:!!data.book},
+    {lbl:'MailerLite',    ic:'📧',done:!!data.mailerlite},
+    {lbl:'Pola Makan',    ic:'🥦',done:!!data.eat},
+  ];
+  if(isFast)tasks.push({lbl:'Puasa Daud',ic:'🌙',done:!!data.fast});
+  return{tasks,done:tasks.filter(t=>t.done).length,total:tasks.length};
+}
+
+/* ── DAUD FAST ── */
+function isDaud(date=new Date()){
+  const day=date.getDay();if(day===0||day===6)return false;
+  const ref=new Date('2025-01-06');let count=0;
+  const d=new Date(ref);
+  while(d<date){if(d.getDay()!==0&&d.getDay()!==6)count++;d.setDate(d.getDate()+1)}
+  return count%2===0;
+}
+function nextFasts(n=3){
+  const res=[];const d=new Date();d.setDate(d.getDate()+1);
+  while(res.length<n){if(isDaud(d))res.push(`${DAYS[d.getDay()]} ${d.getDate()} ${MONTHS[d.getMonth()]}`);d.setDate(d.getDate()+1)}
+  return res;
+}
+
+/* ── STREAK ── */
+function getStreak(key){
+  const today=new Date();let s=0;
+  for(let i=0;i<90;i++){
+    const d=new Date(today);d.setDate(today.getDate()-i);
+    if(key==='fast'&&!isDaud(d)&&i>0){if(s>0){}continue}
+    const k=todayKey(d);
+    const done=key==='plank_all'
+      ?Object.values(hist[k]?.prayers||{}).filter(Boolean).length===5
+      :hist[k]?.[key];
+    if(done)s++;else if(i>0)break;
+  }
+  return s;
+}
+
+/* ── MAIN RENDER ── */
+function renderAll(){
+  const today=new Date();
+  const data=getDay();
+  const isFast=isDaud(today);
+  const {tasks,done,total}=scoreDay(data,today);
+
+  const hr=today.getHours();
+  const greet=hr<5?'Selamat Malam':hr<11?'Selamat Pagi':hr<15?'Selamat Siang':hr<19?'Selamat Sore':'Selamat Malam';
+  el('dayGreet').textContent=`${greet} · ${DAYS[today.getDay()]}`;
+  el('dateStr').textContent=`${today.getDate()} ${MONTHS[today.getMonth()]} ${today.getFullYear()}`;
+  el('hdrScore').textContent=`${done}/${total} selesai`;
+
+  const circ=2*Math.PI*35;
+  el('ringC').style.strokeDashoffset=circ*(1-done/total);
+  el('ringC').setAttribute('stroke',done===total?'var(--teal)':done>=Math.ceil(total/2)?'var(--gold)':'var(--vio)');
+  el('ringNum').textContent=done;
+  el('ringDen').textContent='/'+total;
+
+  el('scoreTasks').innerHTML=tasks.map(t=>
+    `<div class="stask ${t.done?'ok':'no'}">${t.done?'✅':'⬜'} ${t.ic} ${t.lbl}</div>`
+  ).join('');
+
+  // Identity votes
+  const allDays=Object.keys(hist).length||1;
+  const doneAny=Object.values(hist).filter(d=>d.book||d.mailerlite||d.eat).length;
+  el('voteBar').style.width=Math.min(100,Math.round((doneAny/allDays)*100))+'%';
+  el('voteCt').textContent=`${doneAny} votes`;
+
+  renderPlank(data);
+  renderBook(data);
+  renderML(data);
+  renderEat(data);
+  renderFast(data,today,isFast);
+  renderXP();
+  checkMS();
+
+  const pp=el('tab-progress');if(pp&&pp.style.display!=='none')renderProgress();
+  const rr=el('tab-reward');if(rr&&rr.style.display!=='none')renderReward();
+}
+
+function renderPlank(data){
+  const p=data.prayers||{};
+  const pd=PRAYERS.filter(pr=>p[pr.id]).length;
+  el('pgrid').innerHTML=PRAYERS.map(pr=>`
+    <button class="pbtn ${p[pr.id]?'on':''}" onclick="togglePrayer('${pr.id}')" aria-pressed="${!!p[pr.id]}">
+      <span class="pbtn-ic">${pr.ic}</span>
+      <span class="pbtn-nm">${pr.nm}</span>
+      <span class="pbtn-ck">${p[pr.id]?'✓':'tap'}</span>
+    </button>`).join('');
+  el('pCt').textContent=`${pd}/5 shalat`;
+  el('pTotal').textContent=`${pd*30}s plank`;
+  el('pBar').style.width=(pd/5*100)+'%';
+  const s=getStreak('plank_all');
+  el('plankBadge').innerHTML=s>0?`<span class="badge t">🔥 ${s} hari</span>`:'';
+  el('plankCard').className='hc'+(pd===5?' done':'');
+}
+
+function renderBook(data){
+  const done=!!data.book;
+  const b=el('bookBox');b.className='cbox cv'+(done?' on':'');b.textContent=done?'✓':'';
+  el('bookLbl').textContent=done?'✅ Selesai membaca hari ini!':'Tandai selesai membaca hari ini';
+  el('bookLbl').className='clbl '+(done?'ok':'no');
+  el('bookBar').style.width=done?'100%':'0%';
+  const s=getStreak('book');
+  el('bookBadge').innerHTML=s>0?`<span class="badge v">🔥 ${s} hari</span>`:'';
+  el('bookCard').className='hc'+(done?' done':'');
+}
+
+function renderML(data){
+  const done=!!data.mailerlite;
+  const m=el('mlBox');m.className='cbox cr'+(done?' on':'');m.textContent=done?'✓':'';
+  el('mlLbl').textContent=done?'✅ Sesi belajar selesai!':'Tandai sesi belajar selesai';
+  el('mlLbl').className='clbl '+(done?'ok':'no');
+  el('mlBar').style.width=done?'100%':'0%';
+  const s=getStreak('mailerlite');
+  el('mlBadge').innerHTML=s>0?`<span class="badge r">🔥 ${s} hari</span>`:'';
+  el('mlCard').className='hc'+(done?' done':'');
+}
+
+function renderEat(data){
+  const r=data.eatRating||0;
+  el('egrid').innerHTML=EAT.map((e,i)=>
+    `<button class="ebtn ${r===i+1?'on':''}" onclick="setEat(${i+1})">${e}</button>`
+  ).join('');
+  const notes=['','😔 Perlu lebih baik','😐 Lumayan','🙂 Bagus!','😊 Luar biasa!','🥗 Sempurna!'];
+  el('enote').textContent=r?notes[r]:'Belum dinilai hari ini';
+  const s=getStreak('eat');
+  el('eatBadge').innerHTML=s>0?`<span class="badge a">🔥 ${s} hari</span>`:'';
+  el('eatCard').className='hc'+(data.eat?' done':'');
+}
+
+function renderFast(data,today,isFast){
+  el('fastCard').className='hc'+(isFast&&data.fast?' done fast-today':isFast?' fast-today':'');
+  el('fastTdBadge').style.display=isFast?'':'none';
+  const fs=getStreak('fast');
+  el('fastBadge').innerHTML=(fs>0&&isFast)?`<span class="badge g">🔥 ${fs} hari</span>`:'';
+  if(isFast){
+    const fd=!!data.fast;
+    el('fastContent').innerHTML=`
+      <div class="crow">
+        <div class="cbox ca ${fd?'on':''}" onclick="toggleFast()">${fd?'✓':''}</div>
+        <div><div class="clbl ${fd?'ok':'no'}">${fd?'✅ Alhamdulillah, puasa selesai!':'Tandai puasa hari ini selesai'}</div>
+        <div style="font-size:10px;color:rgba(244,168,71,0.45);margin-top:3px;font-family:var(--fm)">بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ</div></div>
+      </div>`;
+  } else {
+    const wknd=today.getDay()===0||today.getDay()===6;
+    el('fastContent').innerHTML=`
+      <div style="font-size:11.5px;color:var(--t3);margin-bottom:8px">${wknd?'🏖️ Weekend — libur puasa Daud':'📅 Bukan jadwal puasa hari ini'}</div>
+      <div style="font-size:10px;color:var(--t3);margin-bottom:5px;font-family:var(--fm)">JADWAL BERIKUTNYA</div>
+      ${nextFasts(3).map(d=>`<div class="nfd">📅 ${d}</div>`).join('')}`;
+  }
+}
+
+/* ── PROGRESS TAB ── */
+function renderProgress(){
+  const today=new Date();
+  const bars=[];
+  for(let i=6;i>=0;i--){
+    const d=new Date(today);d.setDate(today.getDate()-i);
+    const k=todayKey(d);const data=hist[k]||{};
+    const {done,total}=scoreDay(data,d);const pct=total?done/total:0;
+    const color=pct>=1?'var(--teal)':pct>=0.6?'var(--gold)':'var(--vio)';
+    bars.push({day:DAYSS[d.getDay()],done,total,pct,color,isToday:i===0});
+  }
+  el('barChart').innerHTML=bars.map(b=>`
+    <div class="bar-col ${b.isToday?'bar-today':''}">
+      <div class="bar-sc" style="color:${b.color}">${b.done}/${b.total}</div>
+      <div class="bar-track"><div class="bar-fill" style="height:${Math.round(b.pct*100)}%;background:${b.color};opacity:${b.isToday?1:0.7}"></div></div>
+      <div class="bar-day">${b.day}</div>
+    </div>`).join('');
+
+  const stats=[
+    {lbl:'Plank',    ic:'🧘',key:'plank_all',color:'var(--teal)',unit:'hari beruntun'},
+    {lbl:'Baca Buku',ic:'📖',key:'book',     color:'var(--vio)', unit:'hari beruntun'},
+    {lbl:'MailerLite',ic:'📧',key:'mailerlite',color:'var(--rose)',unit:'hari beruntun'},
+    {lbl:'Pola Makan',ic:'🥦',key:'eat',     color:'var(--amb)', unit:'hari beruntun'},
+    {lbl:'Puasa Daud',ic:'🌙',key:'fast',    color:'var(--gold)',unit:'hari berhasil'},
+    {lbl:'Total XP',  ic:'✦', key:null,      color:'var(--gold)',unit:'poin terkumpul'},
+  ];
+  el('streakGrid').innerHTML=stats.map(s=>{
+    const n=s.key?getStreak(s.key):(user.xp||0);
+    return `<div class="sstat" style="border-color:${s.color}22">
+      <div class="sstat-ic">${s.ic}</div>
+      <div class="sstat-nm">${s.lbl}</div>
+      <div class="sstat-n" style="color:${s.color}">${n}</div>
+      <div class="sstat-u">${s.unit}</div>
+    </div>`;
+  }).join('');
+
+  const done=Object.values(hist).filter(d=>d.book||d.mailerlite||d.eat).length;
+  const gain=+(((Math.pow(1.01,done)-1)*100)*Math.min(1,done/30)).toFixed(1);
+  el('onePctN').textContent=`+${gain}%`;
+  el('onePctDesc').textContent=done<7?'Terus konsisten! Keajaiban dimulai setelah 7 hari.'
+    :done<30?'Momentum sedang terbentuk. 1% setiap hari = hasil luar biasa dalam setahun!'
+    :'Luar biasa! Konsistensimu sudah membentuk identitas baru. Keep going! 🌟';
+
+  const laws=[
+    {n:'Hukum 1',nm:'Make it Obvious',   desc:'Notifikasi = cue yang jelas',       color:'var(--teal)',ok:getStreak('plank_all')>0},
+    {n:'Hukum 2',nm:'Make it Attractive',desc:'XP & badge = daya tarik',           color:'var(--vio)', ok:(user.xp||0)>50},
+    {n:'Hukum 3',nm:'Make it Easy',      desc:'Habit stacking & 2-menit rule',     color:'var(--rose)',ok:getStreak('book')>0},
+    {n:'Hukum 4',nm:'Make it Satisfying',desc:'Streak & milestone = kepuasan',     color:'var(--amb)', ok:getStreak('eat')>0},
+  ];
+  el('lawsGrid').innerHTML=laws.map(l=>`
+    <div class="law" style="border-color:${l.color}22">
+      <div class="law-n" style="color:${l.color}">${l.n}</div>
+      <div class="law-name">${l.nm}</div>
+      <div class="law-desc">${l.desc}</div>
+      <div class="law-sc" style="color:${l.color}">${l.ok?'✅':'⬜'}</div>
+    </div>`).join('');
+}
+
+/* ── REWARD TAB ── */
+function renderReward(){
+  const done=user.ms||[];
+  const gs=k=>getStreak(k);
+  el('msScroll').innerHTML=MILESTONES.map(m=>{
+    const ok=done.includes(m.id);
+    return `<div class="ms-card ${ok?'unlocked':'locked'}">
+      <div class="ms-ic">${m.ic}</div>
+      <div class="ms-nm">${m.nm}</div>
+      <div class="ms-cd">${m.cd}</div>
+      <div class="ms-badge ${ok?'y':'n'}">${ok?'✅ Terbuka!':'🔒 +'+m.xp+' XP'}</div>
+    </div>`;
+  }).join('');
+
+  const gs2=k=>getStreak(k);
+  const wk=[
+    {ic:'🧘',nm:'7 Hari Plank',      desc:'Plank 5 shalat, 7 hari berturut',done:gs2('plank_all')>=7, prog:`${gs2('plank_all')}/7`},
+    {ic:'📖',nm:'7 Hari Membaca',    desc:'Baca buku setiap hari',           done:gs2('book')>=7,      prog:`${gs2('book')}/7`},
+    {ic:'📧',nm:'7 Hari MailerLite', desc:'Belajar email marketing tiap hari',done:gs2('mailerlite')>=7,prog:`${gs2('mailerlite')}/7`},
+    {ic:'🥦',nm:'7 Hari Pola Sehat', desc:'Makan sehat setiap hari',          done:gs2('eat')>=7,       prog:`${gs2('eat')}/7`},
+    {ic:'🌙',nm:'Puasa Istiqomah',   desc:'3x puasa Daud berhasil',           done:Object.values(hist).filter(d=>d.fast).length>=3,prog:`${Object.values(hist).filter(d=>d.fast).length}/3`},
+  ];
+  el('weeklyChallenge').innerHTML=wk.map(c=>`
+    <div class="wk-item">
+      <div><div class="wk-name">${c.ic} ${c.nm}</div><div class="wk-desc">${c.desc}</div></div>
+      <div class="wk-prog" style="color:${c.done?'var(--teal)':'var(--t3)'}">${c.done?'✅ Done!':c.prog}</div>
+    </div>`).join('');
+}
+
+/* ── NOTIF ── */
+function notifSupport(){return 'Notification' in window}
+function notifPerm(){return notifSupport()?Notification.permission:'unsupported'}
+
+function renderNotif(){
+  const p=notifPerm();
+  const s=el('nstatus');
+  if(p==='unsupported'){s.className='nstatus warn';s.innerHTML='⚠️ Buka file ini di <strong>Chrome Android</strong> → Add to Home Screen untuk notifikasi background.'}
+  else if(p==='granted'){s.className='nstatus ok';s.innerHTML='✅ Notifikasi aktif! Pengingat muncul sesuai jadwal di bawah, bahkan saat app ditutup.'}
+  else if(p==='denied'){s.className='nstatus err';s.innerHTML='❌ Notifikasi diblokir. Buka Pengaturan Chrome → Privasi → Pengaturan Situs → Notifikasi → izinkan.'}
+  else{s.className='nstatus warn';s.innerHTML='⚠️ Notifikasi belum diizinkan. Tap <strong>"Aktifkan Notifikasi"</strong> di bawah.'}
+
+  el('nlist').innerHTML=NOTIFS.map(n=>{
+    const enabled=nprefs[n.id]!==false;
+    return `
+      <div class="nitem">
+        <div>
+          <div class="nname">${n.title}</div>
+          <div class="ntime">⏰ ${String(n.hour).padStart(2,'0')}:${String(n.min).padStart(2,'0')} WIB — ${n.nm}</div>
+        </div>
+        <label class="tog" aria-label="Toggle ${n.nm}">
+          <input type="checkbox" ${enabled?'checked':''} onchange="toggleNotif('${n.id}',this.checked)"/>
+          <span class="tog-sl"></span>
+        </label>
+      </div>`;
+  }).join('');
+}
+
+function toggleNotif(id,val){nprefs[id]=val;sv('dt_v4_notif',nprefs);scheduleAlarms()}
+
+async function reqNotif(){
+  if(!notifSupport()){showToast('⚠️ Buka file di Chrome Android');return}
+  const p=await Notification.requestPermission();
+  if(p==='granted'){showToast('✅ Notifikasi aktif!');scheduleAlarms();}
+  else showToast('❌ Izin notifikasi ditolak');
+  renderNotif();
+}
+
+function testNotif(){
+  if(!notifSupport()||Notification.permission!=='granted'){showToast('⚠️ Aktifkan notifikasi dulu!');return}
+  try{new Notification('🌟 Daily Tracker',{body:'Bismillah, semangat hari ini! 💪',tag:'test'})}catch(e){showToast('❌ '+e.message);return}
+  showToast('🔔 Test notifikasi dikirim!');
+}
+
+/* ── ALARM SCHEDULER (pure setTimeout, no SW needed) ── */
+let _alarms=[];
+function scheduleAlarms(){
+  _alarms.forEach(clearTimeout);_alarms=[];
+  if(!notifSupport()||Notification.permission!=='granted')return;
+  NOTIFS.filter(n=>nprefs[n.id]!==false).forEach(n=>{
+    const now=new Date();
+    const t=new Date(now);
+    t.setHours(n.hour,n.min,0,0);
+    let ms=t-now;
+    if(ms<0)ms+=86400000; // jadwalkan besok jika sudah lewat
+    const id=setTimeout(()=>{
+      try{new Notification(n.title,{body:n.msg,tag:n.id,renotify:true})}catch{}
+      // jadwal ulang untuk hari berikutnya
+      scheduleAlarms();
+    },ms);
+    _alarms.push(id);
+  });
+}
+
+/* ── TABS ── */
+const TABS=['today','progress','reward','notif'];
+let curTab='today';
+function switchTab(t){
+  curTab=t;
+  TABS.forEach(id=>{
+    const pane=el('tab-'+id);if(pane)pane.style.display=id===t?'':'none';
+  });
+  document.querySelectorAll('.tab').forEach((btn,i)=>btn.className='tab'+(TABS[i]===t?' on':''));
+  document.querySelectorAll('.bnav-btn').forEach((btn,i)=>btn.className='bnav-btn'+(TABS[i]===t?' on':''));
+  if(t==='progress')renderProgress();
+  if(t==='reward'){renderReward();renderXP();}
+  if(t==='notif')renderNotif();
+}
+
+/* ── TOAST ── */
+function showToast(msg,dur=2900){
+  const e=el('toast');e.textContent=msg;e.classList.add('show');
+  setTimeout(()=>e.classList.remove('show'),dur);
+}
+
+/* ── CONFETTI ── */
+function confetti(){
+  const colors=['var(--gold)','var(--teal)','var(--vio)','var(--rose)','var(--amb)'];
+  for(let i=0;i<20;i++){
+    const e=document.createElement('div');e.className='cfp';
+    e.style.cssText=`left:${15+Math.random()*70}%;top:${55+Math.random()*30}px;background:${colors[i%5]};animation-delay:${Math.random()*0.5}s;animation-duration:${1.2+Math.random()*0.6}s`;
+    document.body.appendChild(e);setTimeout(()=>e.remove(),2200);
+  }
+}
+
+/* ── PWA INSTALL ── */
+function doInstall(){
+  if(_deferredPrompt){
+    _deferredPrompt.prompt();
+    _deferredPrompt.userChoice.then(r=>{
+      if(r.outcome==='accepted'){showToast('🎉 App berhasil diinstall!');el('installBanner').classList.remove('show')}
+      _deferredPrompt=null;
+    });
+  } else showToast('Tap ⋮ → "Tambahkan ke Layar Utama"');
+}
+window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();_deferredPrompt=e;el('installBanner').classList.add('show')});
+window.addEventListener('appinstalled',()=>{el('installBanner').classList.remove('show');showToast('🎉 App berhasil dipasang!');_deferredPrompt=null});
+
+/* ── HAPTIC ── */
+document.addEventListener('click',e=>{
+  const t=e.target;
+  if(t.classList.contains('pbtn')||t.classList.contains('cbox')||t.classList.contains('ebtn'))
+    if('vibrate' in navigator)navigator.vibrate([30,10,20]);
+});
+
+/* ── UTIL ── */
+function el(id){return document.getElementById(id)}
+
+/* ── INIT ── */
+renderAll();
+renderNotif();
+if(notifSupport()&&Notification.permission==='granted')scheduleAlarms();
+setInterval(renderAll,60000);
+
+</script>
+</body>
+</html>
